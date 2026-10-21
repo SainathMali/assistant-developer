@@ -1,46 +1,46 @@
-# 🚀 Spring AI Developer Assistant
+# 🚀 CodeX Assistant — Spring AI Developer Assistant
 
-> An AI-powered developer assistant built with **Spring Boot, Spring AI, and OpenRouter** — designed to answer developer questions, remember conversation context, and interact with project files through custom tools.
+An AI-powered developer assistant built with **Java 17, Spring Boot, Spring AI, and OpenRouter**. It supports AI chat, conversation memory, and tools that help the assistant explore and explain project source code.
 
 ![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot)
-![Spring AI](https://img.shields.io/badge/Spring%20AI-Enabled-6DB33F)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-Enabled-6DB33F?logo=spring)
 ![API](https://img.shields.io/badge/API-REST-blue)
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
 
 ## ✨ Features
 
-- 🤖 **AI-Powered Chat** — Interact with an AI model through a REST API.
-- 🧠 **Conversation Memory** — Maintain context across messages using conversation IDs.
-- 🛠️ **Project Tools** — Custom tools for listing Java files and searching source code.
-- 🔍 **Codebase Exploration** — Build toward answering questions about your own source code.
-- 🔌 **OpenRouter Integration** — Connect to supported AI models through an OpenAI-compatible API.
-- ☕ **Java Backend** — Built using the Spring Boot ecosystem.
+- 🤖 **AI Chat:** Ask development-related questions through a REST API.
+- 🧠 **Conversation Memory:** Retain conversational context using a conversation ID.
+- 📂 **List Project Files:** Find Java source files in the project.
+- 🔍 **Search Codebase:** Search Java files for specific keywords.
+- 📖 **Read Project Files:** Read and explain permitted source files.
+- 🛡️ **System Instructions:** Encourage accurate answers based on project files and conversation history.
+- 🔌 **OpenRouter Integration:** Connect to supported AI models using an OpenAI-compatible API.
 
 ## 🧰 Tech Stack
 
 | Technology | Purpose |
 |---|---|
 | Java 17 | Programming language |
-| Spring Boot | Backend application |
+| Spring Boot | Backend framework |
 | Spring AI | AI integration and tool calling |
 | OpenRouter | AI model provider |
 | Maven | Dependency management |
-| REST API | Client-server communication |
+| REST API | Communication with the assistant |
 
 ## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
-    A[User / API Client] --> B[Spring Boot Controller]
+    A[Postman / API Client] --> B[AssistantController]
     B --> C[Spring AI ChatClient]
     C --> D[Conversation Memory]
-    C --> E[Project Tools]
-    C --> F[OpenRouter AI Model]
+    C --> E[ProjectTools]
+    C --> F[OpenRouter Model]
     E --> G[Java Source Files]
     F --> H[AI Response]
     D --> C
-    G --> E
     H --> B
     B --> A
 ```
@@ -60,31 +60,36 @@ developer-assistant-ai/
 │       │       └── DeveloperAssistantAiApplication.java
 │       └── resources/
 │           └── application.properties
+├── screenshots/
+│   ├── read-project-file.png
+│   ├── conversation-memory.png
+│   └── memory-recall.png
 ├── pom.xml
 └── README.md
 ```
 
 ## ⚙️ Getting Started
 
-### 1. Prerequisites
-
-Install the following:
+### Prerequisites
 
 - JDK 17
 - Maven
 - An OpenRouter API key
 - IntelliJ IDEA or VS Code
+- Postman (for API testing)
 
-### 2. Clone the repository
+### 1. Clone the repository
+
+Replace `YOUR_USERNAME` with your GitHub username.
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/assistant-developer.git
 cd assistant-developer
 ```
 
-### 3. Configure the API key
+### 2. Configure the API key
 
-Set your OpenRouter API key as an environment variable. Never commit your real API key to GitHub.
+Set your OpenRouter API key as an environment variable.
 
 **Windows PowerShell:**
 
@@ -102,114 +107,136 @@ spring.ai.openai.api-key=${OPENROUTER_API_KEY}
 spring.ai.openai.chat.options.model=openai/gpt-4o-mini
 ```
 
-Use a model available to your OpenRouter account. The model identifier above is an example.
+The model identifier is an example; use a model available to your OpenRouter account.
 
-### 4. Run the application
+**Important:** Never commit your real API key to GitHub.
+
+### 3. Run the application
 
 ```bash
 mvn spring-boot:run
 ```
 
-The application should start at:
+The application runs at:
 
 `http://localhost:8080`
 
 ## 🌐 API Usage
 
-### Chat with the assistant
-
-**Endpoint**
+### Chat endpoint
 
 ```http
-GET /assistant/chat
+GET http://localhost:8080/assistant/chat
 ```
-
-**Query parameters**
 
 | Parameter | Required | Description |
 |---|---|---|
-| `message` | Yes | The question or instruction |
+| `message` | Yes | Your question or instruction |
 | `conversationId` | No | Identifies the conversation; defaults to `Default-session` |
 
-**Example request**
+### Example: Ask a question
 
 ```http
 GET http://localhost:8080/assistant/chat?message=Explain%20Java%20interfaces&conversationId=java-session
 ```
 
-**Example response**
-
-```text
-A Java interface defines a contract that implementing classes must follow.
-It can declare abstract methods and also support default and static methods.
-```
-
-The response content is generated by the configured AI model; the example above is illustrative.
+You can also enter `message` and `conversationId` separately in Postman's **Params** tab.
 
 ## 🧠 Conversation Memory
 
-The assistant uses Spring AI's `MessageChatMemoryAdvisor` to provide conversation context.
+The assistant uses Spring AI's `MessageChatMemoryAdvisor` to provide context across messages.
 
-Example conversation:
+For messages belonging to the same conversation, use the same `conversationId`.
 
-```text
-User: My Spring Boot version is 4.1.1.
-Assistant: Got it.
+**Example test:**
 
-User: Which version did I tell you?
-Assistant: You told me Spring Boot 4.1.1.
-```
+1. Send: `My project is Developer Assistant AI built using Spring Boot and Spring AI.`
+2. Keep the same conversation ID.
+3. Ask: `What is my project name, and which technologies am I using?`
 
-Use the same `conversationId` for messages that belong to the same conversation.
+The assistant can use the previous message as conversation context.
 
-> **Note:** Memory behavior depends on the configured `ChatMemory` implementation. In-memory history may be lost when the application restarts.
+### Conversation memory screenshot
+
+![Conversation memory test](screenshots/conversation-memory.png)
+
+### Memory recall screenshot
+
+![Memory recall test](screenshots/memory-recall.png)
+
+> Memory is conversational context, not proof of project facts. The assistant should verify code-related information using project tools where appropriate. Persistence across application restarts depends on the configured memory implementation.
 
 ## 🛠️ Project Tools
 
-The project includes custom tools in `ProjectTools.java`.
+The `ProjectTools.java` class provides tools for exploring source code.
 
 | Tool | Purpose |
 |---|---|
-| `listProjectFiles()` | Lists Java source files |
-| `searchCodebase(keyword)` | Searches Java source files for a keyword |
+| `listProjectFiles()` | Lists Java source files. |
+| `searchCodebase(keyword)` | Searches Java files for a keyword. |
+| `readProjectFile(relativePath)` | Reads an allowed project source file. |
 
-These tools provide a foundation for adding deeper code understanding, source-file reading, and project analysis.
+### Source file reading screenshot
+
+![Read and explain project source file](screenshots/read-project-file.png)
+
+Example instruction to the assistant:
+
+```text
+Use readProjectFile with relativePath
+"src/main/java/com/codex17/developer_assistant/controller/AssistantController.java"
+and explain the actual code.
+```
+
+The assistant can then use the returned source content to explain the controller. Tool availability and results depend on the application's configuration and the model's tool-calling behavior.
+
+## 🧠 AI Response Guidelines
+
+The assistant is configured with system instructions to:
+
+- Use actual project files and conversation history.
+- Avoid inventing class names, methods, paths, or dependencies.
+- Avoid claiming to have read files it has not inspected.
+- Clearly identify missing information.
+- Distinguish verified facts from assumptions.
+- Use project tools when questions require source code.
+- Treat conversation memory as context, not proof.
+
+These instructions help reduce hallucinations but cannot guarantee that every response is correct.
 
 ## 🔐 Security Notes
 
 - Store API keys in environment variables.
-- Never commit secrets to GitHub.
-- Validate user input.
+- Never upload secrets to GitHub.
 - Restrict file access to the intended project directory.
-- Consider authentication, authorization, and rate limiting before public deployment.
+- Validate user input.
+- Add authentication, authorization, rate limiting, and appropriate error handling before public deployment.
 
 ## 🗺️ Roadmap
 
 - [x] Integrate Spring AI with OpenRouter
 - [x] Create a chat REST endpoint
 - [x] Add conversation memory
-- [x] Create basic project tools
-- [ ] Read and explain individual source files
-- [ ] Inspect `pom.xml` and identify dependencies
-- [ ] Add code debugging assistance
+- [x] List Java project files
+- [x] Search Java source files
+- [x] Read and explain source files
+- [x] Add project-specific system instructions
+- [ ] Improve error handling and API responses
+- [ ] Add automated tests
 - [ ] Build a web-based chat interface
-- [ ] Add automated tests and Docker support
+- [ ] Add Docker support
 
 ## 🤝 Contributing
 
-Contributions, suggestions, and bug reports are welcome.
+Suggestions, improvements, and bug reports are welcome.
 
 1. Fork the repository.
 2. Create a feature branch.
 3. Make your changes.
 4. Submit a pull request.
 
-## 👨‍💻 Author
+## 👨‍💻 About
 
-**Project:** Spring AI Developer Assistant
+**CodeX Assistant** is a hands-on project for learning Spring AI, LLM integration, conversation memory, and tool calling with Java and Spring Boot.
 
-Built as a hands-on project to learn Spring AI, LLM integration, conversation memory, and AI tool calling.
-
----
-
-⭐ If you find this project useful, consider giving the repository a star.
+If you find the project useful, consider giving the repository a ⭐.
