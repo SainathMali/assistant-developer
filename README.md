@@ -163,7 +163,6 @@ The assistant can use the previous message as conversation context.
 ### Memory recall screenshot
 
 ![Memory recall test](screenshots/memory-recall.png)
-
 > Memory is conversational context, not proof of project facts. The assistant should verify code-related information using project tools where appropriate. Persistence across application restarts depends on the configured memory implementation.
 
 ## 🛠️ Project Tools
